@@ -6,7 +6,7 @@ setup(
     version='0.1.0',
     description="Python downloader with progress",
     long_description=open('README.rst').read(),
-    keywords='115 wangpan pan cloud lixian',
+    keywords='download progress',
     author='Shichao An',
     author_email='shichao.an@nyu.edu',
     url='https://github.com/shichao-an/homura',
