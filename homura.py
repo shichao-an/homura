@@ -190,5 +190,5 @@ class Homura(object):
 def download(url, path=None, headers=None, session=None, show_progress=True,
              resume=True, auto_retry=True):
     """Download using download manager"""
-    dm = Homura(url, path, headers, session, show_progress, resume, auto_retry)
-    dm.start()
+    hm = Homura(url, path, headers, session, show_progress, resume, auto_retry)
+    hm.start()
