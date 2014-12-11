@@ -5,7 +5,6 @@ import six
 import sys
 import time
 import pycurl
-from requests.utils import quote as _quote
 from requests.utils import unquote as _unquote
 from humanize import naturalsize
 
@@ -14,25 +13,12 @@ STREAM = sys.stderr
 
 if PY3:
     from urllib.parse import urlparse
-    bin_type = bytes
-    txt_type = str
 else:
     from urlparse import urlparse
-    bin_type = str
-    txt_type = unicode
-
-str_types = (bin_type, txt_type)
 
 
 def eval_path(path):
     return os.path.abspath(os.path.expanduser(path))
-
-
-def quote(s):
-    res = s
-    if isinstance(res, six.text_type):
-        res = s.encode('utf-8')
-    return _quote(res)
 
 
 def unquote(s):
@@ -142,6 +128,10 @@ class Homura(object):
                 # transfer closed with n bytes remaining to read
                 if e.args[0] == 18:
                     pass
+                # HTTP server doesn't seem to support byte ranges.
+                # Cannot resume.
+                elif e.args[0] == 33:
+                    break
                 else:
                     raise e
 
