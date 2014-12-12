@@ -32,7 +32,7 @@ def unquote(s):
 
 
 def dict_to_list(d):
-    return ['%s: %s' % (k, v) for k, v in d.iteritems()]
+    return ['%s: %s' % (k, v) for k, v in d.items()]
 
 
 def is_temp_path(path):
