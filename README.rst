@@ -1,9 +1,17 @@
 Homura
 ======
 
-Homura (ほむら) is a Python downloader with progress. It can be used to download large files and supports resume download. 
+Homura (ほむら) is a Python downloader with progress, which can be used to download large files.
 
 It is named after `Homura Akemi <http://ja.wikipedia.org/wiki/%E6%9A%81%E7%BE%8E%E3%81%BB%E3%82%80%E3%82%89>`_.
+
+Features
+========
+
+* PycURL based
+* Resume downloads (if server supports `byte ranges <http://en.wikipedia.org/wiki/Byte_serving>`_ on the resource)
+* Support for requests.Session
+
 
 Installation
 ------------
@@ -37,7 +45,6 @@ To specify path for downloaded file:
 
 .. code-block:: python
 
-    >>> from homura import download
     >>> download(url='http://download.thinkbroadband.com/200MB.zip',
                  path='/path/to/big.zip')
 

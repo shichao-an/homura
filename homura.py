@@ -56,7 +56,6 @@ def get_resource_name(url):
 
 
 class Homura(object):
-    """Donwload manager that displays progress"""
     progress_template = \
         '%(percent)6d%% %(downloaded)12s %(speed)15s %(eta)18s ETA'
     eta_limit = 2592000  # 30 days
