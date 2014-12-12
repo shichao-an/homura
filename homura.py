@@ -77,7 +77,6 @@ class Homura(object):
             transfer until the file's download is finished
         """
         self.url = url
-        self._path = path  # Given path
         self.path = self._get_path(path, url)  # Real path
         self.headers = headers
         self.session = session
@@ -87,7 +86,8 @@ class Homura(object):
         self.start_time = None
         self.content_length = 0
         self.downloaded = 0
-        self._c = None
+        self._path = path  # Save given path
+        self._pycurl = pycurl.Curl()
         self._cookie_header = self._get_cookie_header()
         self._last_time = 0.0
 
@@ -122,8 +122,7 @@ class Homura(object):
 
     def curl(self):
         """Sending a single cURL request to download"""
-        c = pycurl.Curl()
-        self._c = c
+        c = self._pycurl
         # Resume download
         if os.path.exists(self.path) and self.resume:
             mode = 'ab'
@@ -143,7 +142,10 @@ class Homura(object):
             c.perform()
 
     def start(self):
-        """Start downloading"""
+        """
+        Start downloading, handling auto retry, download resume and path
+        moving
+        """
         if not self.auto_retry:
             self.curl()
             return
@@ -160,8 +162,8 @@ class Homura(object):
                     break
                 else:
                     raise e
-        self.move_path()
-        self.done()
+        self._move_path()
+        self._done()
 
     def progress(self, download_t, download_d, upload_t, upload_d):
         if int(download_t) == 0:
@@ -212,16 +214,16 @@ class Homura(object):
         if os.path.exists(self.path):
             return self.content_length == os.path.getsize(self.path)
 
-    def done(self):
+    def _done(self):
         STREAM.write('\n')
         STREAM.flush()
 
-    def move_path(self):
+    def _move_path(self):
         """
         Move the downloaded file to the authentic path (identified by
         effective URL
         """
-        if is_temp_path(self._path) and self._c is not None:
+        if is_temp_path(self._path) and self._pycurl is not None:
             eurl = self._c.getinfo(pycurl.EFFECTIVE_URL)
             er = get_resource_name(eurl)
             r = get_resource_name(self.url)
