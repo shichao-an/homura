@@ -35,7 +35,7 @@ def dict_to_list(d):
     return ['%s: %s' % (k, v) for k, v in d.iteritems()]
 
 
-def is_temp_path(self, path):
+def is_temp_path(path):
     if path is None:
         return True
     else:
@@ -177,7 +177,10 @@ class Homura(object):
         speed = download_d / duration
         speed_s = naturalsize(speed, binary=True)
         speed_s += '/s'
-        eta = int((download_t - download_d) / speed)
+        if speed == 0.0:
+            eta = self.eta_limit
+        else:
+            eta = int((download_t - download_d) / speed)
         if eta < self.eta_limit:
             eta_s = str(datetime.timedelta(seconds=eta))
         else:
@@ -220,10 +223,10 @@ class Homura(object):
         Move the downloaded file to the authentic path (identified by
         effective URL
         """
-        if is_temp_path(self._path):
+        if is_temp_path(self._path) and self._c is not None:
             eurl = self._c.getinfo(pycurl.EFFECTIVE_URL)
             er = get_resource_name(eurl)
-            r = get_resource_name()
+            r = get_resource_name(self.url)
             if er != r and os.path.exists(self.path):
                 new_path = self._get_path(self._path, eurl)
                 shutil.move(self.path, new_path)
