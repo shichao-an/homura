@@ -224,7 +224,7 @@ class Homura(object):
         effective URL
         """
         if is_temp_path(self._path) and self._pycurl is not None:
-            eurl = self._c.getinfo(pycurl.EFFECTIVE_URL)
+            eurl = self._pycurl.getinfo(pycurl.EFFECTIVE_URL)
             er = get_resource_name(eurl)
             r = get_resource_name(self.url)
             if er != r and os.path.exists(self.path):
