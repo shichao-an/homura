@@ -11,6 +11,7 @@ from humanize import naturalsize
 
 PY3 = sys.version_info[0] == 3
 STREAM = sys.stderr
+DEFAULT_RESOURCE = 'index.html'
 
 if PY3:
     from urllib.parse import urlparse
@@ -34,12 +35,31 @@ def dict_to_list(d):
     return ['%s: %s' % (k, v) for k, v in d.iteritems()]
 
 
+def is_temp_path(self, path):
+    if path is None:
+        return True
+    else:
+        path = eval_path(path)
+        if os.path.isdir(path):
+            return True
+    return False
+
+
+def get_resource_name(url):
+    o = urlparse(url)
+    resource = os.path.basename(o.path)
+    if not resource:
+        res = DEFAULT_RESOURCE
+    else:
+        res = resource
+    return unquote(res)
+
+
 class Homura(object):
     """Donwload manager that displays progress"""
     progress_template = \
         '%(percent)6d%% %(downloaded)12s %(speed)15s %(eta)18s ETA'
     eta_limit = 2592000  # 30 days
-    default_resource = 'index.html'
 
     def __init__(self, url, path=None, headers=None, session=None,
                  show_progress=True, resume=True, auto_retry=True):
@@ -58,9 +78,8 @@ class Homura(object):
             transfer until the file's download is finished
         """
         self.url = url
-        self._temp_path = True
         self._path = path  # Given path
-        self.path = self._get_path(path)
+        self.path = self._get_path(path, url)  # Real path
         self.headers = headers
         self.session = session
         self.show_progress = show_progress
@@ -73,9 +92,6 @@ class Homura(object):
         self._cookie_header = self._get_cookie_header()
         self._last_time = 0.0
 
-    def __del__(self):
-        self.done()
-
     def _get_cookie_header(self):
         if self.session is not None:
             cookie = dict(self.session.cookies)
@@ -87,29 +103,17 @@ class Homura(object):
                 return None
             return '; '.join(res)
 
-    def _get_path(self, path, url=None):
+    def _get_path(self, path, url):
         if path is None:
-            path = self._get_resource_name(url)
-            return unquote(path)
+            path = get_resource_name(url)
+            return path
         else:
             path = eval_path(path)
             if os.path.isdir(path):
-                resource = self._get_resource_name(url)
+                resource = get_resource_name(url)
                 return os.path.join(path, resource)
             else:
-                self._temp_path = False
                 return path
-
-    def _get_resource_name(self, url=None):
-        if url is None:
-            url = self.url
-        o = urlparse(url)
-        resource = os.path.basename(o.path)
-        if not resource:
-            res = self.default_resource
-        else:
-            res = resource
-        return res
 
     def _get_pycurl_headers(self):
         headers = self.headers or {}
@@ -118,7 +122,7 @@ class Homura(object):
         return dict_to_list(headers) or None
 
     def curl(self):
-        """Sending cURL request to download"""
+        """Sending a single cURL request to download"""
         c = pycurl.Curl()
         self._c = c
         # Resume download
@@ -212,10 +216,14 @@ class Homura(object):
         STREAM.flush()
 
     def move_path(self):
-        if self._temp_path:
+        """
+        Move the downloaded file to the authentic path (identified by
+        effective URL
+        """
+        if is_temp_path(self._path):
             eurl = self._c.getinfo(pycurl.EFFECTIVE_URL)
-            er = self._get_resource_name(eurl)
-            r = self._get_resource_name()
+            er = get_resource_name(eurl)
+            r = get_resource_name()
             if er != r and os.path.exists(self.path):
                 new_path = self._get_path(self._path, eurl)
                 shutil.move(self.path, new_path)
