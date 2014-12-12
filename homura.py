@@ -167,8 +167,7 @@ class Homura(object):
     def progress(self, download_t, download_d, upload_t, upload_d):
         if int(download_t) == 0:
             return
-        if self.content_length == 0:
-            self.content_length = self.downloaded + int(download_t)
+        self.content_length = self.downloaded + int(download_t)
         if not self.show_progress:
             return
         if self.start_time is None:
@@ -187,7 +186,7 @@ class Homura(object):
             eta_s = 'n/a'
         downloaded = self.downloaded + download_d
         downloaded_s = naturalsize(downloaded, binary=True)
-        percent = int(downloaded / (self.content_length) * 100)
+        percent = int(downloaded / self.content_length * 100)
         params = {
             'downloaded': downloaded_s,
             'percent': percent,
