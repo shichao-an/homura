@@ -5,6 +5,7 @@ import six
 import sys
 import time
 import pycurl
+import shutil
 from requests.utils import unquote as _unquote
 from humanize import naturalsize
 
@@ -57,6 +58,8 @@ class Homura(object):
             transfer until the file's download is finished
         """
         self.url = url
+        self._temp_path = True
+        self._path = path  # Given path
         self.path = self._get_path(path)
         self.headers = headers
         self.session = session
@@ -66,7 +69,7 @@ class Homura(object):
         self.start_time = None
         self.content_length = 0
         self.downloaded = 0
-        self._path = None
+        self._c = None
         self._cookie_header = self._get_cookie_header()
         self._last_time = 0.0
 
@@ -84,24 +87,29 @@ class Homura(object):
                 return None
             return '; '.join(res)
 
-    def _get_path(self, path=None):
+    def _get_path(self, path, url=None):
         if path is None:
-            path = self._get_resource_name()
+            path = self._get_resource_name(url)
             return unquote(path)
         else:
             path = eval_path(path)
             if os.path.isdir(path):
-                resource = self._get_resource_name()
+                resource = self._get_resource_name(url)
                 return os.path.join(path, resource)
             else:
+                self._temp_path = False
                 return path
 
-    def _get_resource_name(self):
-        o = urlparse(self.url)
+    def _get_resource_name(self, url=None):
+        if url is None:
+            url = self.url
+        o = urlparse(url)
         resource = os.path.basename(o.path)
         if not resource:
-            return self.default_resource
-        return resource
+            res = self.default_resource
+        else:
+            res = resource
+        return res
 
     def _get_pycurl_headers(self):
         headers = self.headers or {}
@@ -112,6 +120,7 @@ class Homura(object):
     def curl(self):
         """Sending cURL request to download"""
         c = pycurl.Curl()
+        self._c = c
         # Resume download
         if os.path.exists(self.path) and self.resume:
             mode = 'ab'
@@ -148,6 +157,8 @@ class Homura(object):
                     break
                 else:
                     raise e
+        self.move_path()
+        self.done()
 
     def progress(self, download_t, download_d, upload_t, upload_d):
         if int(download_t) == 0:
@@ -199,6 +210,16 @@ class Homura(object):
     def done(self):
         STREAM.write('\n')
         STREAM.flush()
+
+    def move_path(self):
+        if self._temp_path:
+            eurl = self._c.getinfo(pycurl.EFFECTIVE_URL)
+            er = self._get_resource_name(eurl)
+            r = self._get_resource_name()
+            if er != r and os.path.exists(self.path):
+                new_path = self._get_path(self._path, eurl)
+                shutil.move(self.path, new_path)
+                self.path = new_path
 
 
 def download(url, path=None, headers=None, session=None, show_progress=True,
