@@ -38,6 +38,7 @@ class Homura(object):
     progress_template = \
         '%(percent)6d%% %(downloaded)12s %(speed)15s %(eta)18s ETA'
     eta_limit = 2592000  # 30 days
+    default_resource = 'index.html'
 
     def __init__(self, url, path=None, headers=None, session=None,
                  show_progress=True, resume=True, auto_retry=True):
@@ -65,6 +66,7 @@ class Homura(object):
         self.start_time = None
         self.content_length = 0
         self.downloaded = 0
+        self._path = None
         self._cookie_header = self._get_cookie_header()
         self._last_time = 0.0
 
@@ -84,11 +86,22 @@ class Homura(object):
 
     def _get_path(self, path=None):
         if path is None:
-            o = urlparse(self.url)
-            path = os.path.basename(o.path)
+            path = self._get_resource_name()
             return unquote(path)
         else:
-            return eval_path(path)
+            path = eval_path(path)
+            if os.path.isdir(path):
+                resource = self._get_resource_name()
+                return os.path.join(path, resource)
+            else:
+                return path
+
+    def _get_resource_name(self):
+        o = urlparse(self.url)
+        resource = os.path.basename(o.path)
+        if not resource:
+            return self.default_resource
+        return resource
 
     def _get_pycurl_headers(self):
         headers = self.headers or {}
@@ -113,6 +126,7 @@ class Homura(object):
             if h is not None:
                 c.setopt(pycurl.HTTPHEADER, h)
             c.setopt(c.NOPROGRESS, 0)
+            c.setopt(pycurl.FOLLOWLOCATION, 1)
             c.setopt(c.PROGRESSFUNCTION, self.progress)
             c.perform()
 
