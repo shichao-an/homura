@@ -57,7 +57,7 @@ def get_resource_name(url):
 
 class Homura(object):
     progress_template = \
-        '%(percent)6d%% %(downloaded)12s %(speed)15s %(eta)18s ETA'
+        '%(percent)6d%% %(downloaded)12s %(speed)15s %(eta)18s ETA' + ' ' * 4
     eta_limit = 2592000  # 30 days
 
     def __init__(self, url, path=None, headers=None, session=None,
