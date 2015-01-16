@@ -30,6 +30,12 @@ Fedora
     $ sudo yum groupinstall "Development Tools"
     $ sudo yum install libcurl libcurl-devel python-devel
 
+Then, install homura
+
+.. code-block:: bash
+
+    $ pip install homura
+
 Usage
 -----
 
