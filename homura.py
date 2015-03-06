@@ -221,7 +221,7 @@ class Homura(object):
     def _move_path(self):
         """
         Move the downloaded file to the authentic path (identified by
-        effective URL
+        effective URL)
         """
         if is_temp_path(self._path) and self._pycurl is not None:
             eurl = self._pycurl.getinfo(pycurl.EFFECTIVE_URL)
