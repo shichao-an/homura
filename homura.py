@@ -33,7 +33,7 @@ def utf8_encode(s):
 
 def utf8_decode(s):
     res = s
-    if not isinstance(res, six.text_type):
+    if isinstance(res, six.binary_type):
         res = s.decode('utf-8')
     return res
 
@@ -92,7 +92,7 @@ class Homura(object):
             transfer until the file's download is finished
         """
         self.url = utf8_decode(url)  # url is in unicode
-        self.path = self._get_path(path, self.url)
+        self.path = self._get_path(utf8_decode(path), self.url)
         self.headers = headers
         self.session = session
         self.show_progress = show_progress
@@ -122,15 +122,13 @@ class Homura(object):
         :return: utf-8 string (bytes in Python 3)
         """
         if path is None:
-            path = get_resource_name(url)
-            return utf8_encode(path)
+            res = get_resource_name(url)
         else:
-            path = eval_path(utf8_decode(path))
-            if os.path.isdir(path):
+            res = eval_path(path)
+            if os.path.isdir(res):
                 resource = get_resource_name(url)
-                return utf8_encode(os.path.join(path, resource))
-            else:
-                return utf8_encode(path)
+                res = os.path.join(res, resource)
+        return utf8_encode(res)
 
     def _get_pycurl_headers(self):
         headers = self.headers or {}
