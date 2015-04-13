@@ -184,9 +184,9 @@ class Homura(object):
         self._done()
 
     def progress(self, download_t, download_d, upload_t, upload_d):
+        self.content_length = self.downloaded + int(download_t)
         if int(download_t) == 0:
             return
-        self.content_length = self.downloaded + int(download_t)
         if not self.show_progress:
             return
         if self.start_time is None:
