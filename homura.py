@@ -31,6 +31,13 @@ def utf8_encode(s):
     return res
 
 
+def utf8_decode(s):
+    res = s
+    if not isinstance(res, six.text_type):
+        res = s.decode('utf-8')
+    return res
+
+
 def unquote(s):
     res = s
     if not PY3:
@@ -54,18 +61,13 @@ def is_temp_path(path):
 
 
 def get_resource_name(url):
-    """
-    :param str url: raw url (Unicode)
-    :return: resource name in utf-8 encoded string
-    :rtype: str
-    """
     o = urlparse(url)
     resource = os.path.basename(o.path)
     if not resource:
         res = DEFAULT_RESOURCE
     else:
         res = resource
-    return unquote(res)
+    return utf8_decode(unquote(res))
 
 
 class Homura(object):
@@ -89,8 +91,8 @@ class Homura(object):
         :param bool auto_retry: whether to retry automatically upon closed
             transfer until the file's download is finished
         """
-        self.url = url
-        self.path = self._get_path(path, url)  # Real path
+        self.url = utf8_decode(url)  # url is in unicode
+        self.path = self._get_path(path, self.url)
         self.headers = headers
         self.session = session
         self.show_progress = show_progress
@@ -116,18 +118,19 @@ class Homura(object):
             return '; '.join(res)
 
     def _get_path(self, path, url):
+        """
+        :return: utf-8 string (bytes in Python 3)
+        """
         if path is None:
             path = get_resource_name(url)
-            return path
+            return utf8_encode(path)
         else:
-            # Force ``path`` into utf-8 to avoid UnicodeDecodeError threw by
-            # posixpath on Python 2.x in os.path.join
-            path = eval_path(utf8_encode(path))
+            path = eval_path(utf8_decode(path))
             if os.path.isdir(path):
                 resource = get_resource_name(url)
-                return os.path.join(path, resource)
+                return utf8_encode(os.path.join(path, resource))
             else:
-                return path
+                return utf8_encode(path)
 
     def _get_pycurl_headers(self):
         headers = self.headers or {}
