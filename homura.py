@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 from __future__ import print_function, absolute_import
 import datetime
 import os
@@ -23,6 +24,13 @@ def eval_path(path):
     return os.path.abspath(os.path.expanduser(path))
 
 
+def utf8_encode(s):
+    res = s
+    if isinstance(res, six.text_type):
+        res = s.encode('utf-8')
+    return res
+
+
 def unquote(s):
     res = s
     if not PY3:
@@ -46,6 +54,11 @@ def is_temp_path(path):
 
 
 def get_resource_name(url):
+    """
+    :param str url: raw url (string or Unicode) in Python 2.x
+    :return: resource name in utf-8 encoded string
+    :rtype: str
+    """
     o = urlparse(url)
     resource = os.path.basename(o.path)
     if not resource:
@@ -76,7 +89,7 @@ class Homura(object):
         :param bool auto_retry: whether to retry automatically upon closed
             transfer until the file's download is finished
         """
-        self.url = url
+        self.url = utf8_encode(url)
         self.path = self._get_path(path, url)  # Real path
         self.headers = headers
         self.session = session
@@ -86,6 +99,7 @@ class Homura(object):
         self.start_time = None
         self.content_length = 0
         self.downloaded = 0
+        self._url = url  # Raw url
         self._path = path  # Save given path
         self._pycurl = pycurl.Curl()
         self._cookie_header = self._get_cookie_header()
@@ -107,7 +121,9 @@ class Homura(object):
             path = get_resource_name(url)
             return path
         else:
-            path = eval_path(path)
+            # Force ``path`` into utf-8 to avoid UnicodeDecodeError threw by
+            # posixpath on Python 2.x in os.path.join
+            path = eval_path(utf8_encode(path))
             if os.path.isdir(path):
                 resource = get_resource_name(url)
                 return os.path.join(path, resource)
