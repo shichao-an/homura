@@ -55,7 +55,7 @@ def is_temp_path(path):
 
 def get_resource_name(url):
     """
-    :param str url: raw url (string or Unicode) in Python 2.x
+    :param str url: raw url (Unicode)
     :return: resource name in utf-8 encoded string
     :rtype: str
     """
@@ -89,7 +89,7 @@ class Homura(object):
         :param bool auto_retry: whether to retry automatically upon closed
             transfer until the file's download is finished
         """
-        self.url = utf8_encode(url)
+        self.url = url
         self.path = self._get_path(path, url)  # Real path
         self.headers = headers
         self.session = session
@@ -99,7 +99,6 @@ class Homura(object):
         self.start_time = None
         self.content_length = 0
         self.downloaded = 0
-        self._url = url  # Raw url
         self._path = path  # Save given path
         self._pycurl = pycurl.Curl()
         self._cookie_header = self._get_cookie_header()
@@ -147,7 +146,7 @@ class Homura(object):
         else:
             mode = 'wb'
         with open(self.path, mode) as f:
-            c.setopt(c.URL, self.url)
+            c.setopt(c.URL, utf8_encode(self.url))
             c.setopt(c.WRITEDATA, f)
             h = self._get_pycurl_headers()
             if h is not None:
