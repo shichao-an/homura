@@ -61,6 +61,7 @@ def is_temp_path(path):
 
 
 def get_resource_name(url):
+    url = utf8_decode(url)  # decode to unicode so PY3's urlparse won't break
     o = urlparse(url)
     resource = os.path.basename(o.path)
     if not resource:
@@ -91,8 +92,8 @@ class Homura(object):
         :param bool auto_retry: whether to retry automatically upon closed
             transfer until the file's download is finished
         """
-        self.url = utf8_decode(url)  # url is in unicode
-        self.path = self._get_path(utf8_decode(path), self.url)
+        self.url = url  # url is in unicode
+        self.path = self._get_path(path, url)
         self.headers = headers
         self.session = session
         self.show_progress = show_progress
@@ -118,17 +119,15 @@ class Homura(object):
             return '; '.join(res)
 
     def _get_path(self, path, url):
-        """
-        :return: utf-8 string (bytes in Python 3)
-        """
         if path is None:
             res = get_resource_name(url)
         else:
-            res = eval_path(path)
+            # decode path to unicode so that os.path.join won't break
+            res = eval_path(utf8_decode(path))
             if os.path.isdir(res):
                 resource = get_resource_name(url)
                 res = os.path.join(res, resource)
-        return utf8_encode(res)
+        return res
 
     def _get_pycurl_headers(self):
         headers = self.headers or {}

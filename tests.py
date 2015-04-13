@@ -19,7 +19,7 @@ FILE_301_SMALL = 'http://dev.moleculea.com/homura/301/SMD5SUMS'
 FILE_301_1MB = 'http://dev.moleculea.com/homura/301/S1MB.zip'
 FILE_301_5MB = 'http://dev.moleculea.com/homura/301/S5MB.zip'
 FILE_UNICODE = u'http://dev.moleculea.com/离线下载.txt'
-FILE_UTF8 = 'http://dev.moleculea.com/离线下载.txt'
+FILE_UTF8 = utf8_encode(u'http://dev.moleculea.com/离线下载.txt')
 
 
 def cleanup_data():
