@@ -77,7 +77,8 @@ class Homura(object):
     eta_limit = 2592000  # 30 days
 
     def __init__(self, url, path=None, headers=None, session=None,
-                 show_progress=True, resume=True, auto_retry=True):
+                 show_progress=True, resume=True, auto_retry=True,
+                 max_rst_retries=5):
         """
         :param str url: URL of the file to be downloaded
         :param str path: local path for the downloaded file; if None, it will
@@ -91,6 +92,8 @@ class Homura(object):
             filename)
         :param bool auto_retry: whether to retry automatically upon closed
             transfer until the file's download is finished
+        :param int max_rst_retries: number of retries upon connection reset by
+            peer (effective only when `auto_retry` is True)
         """
         self.url = url  # url is in unicode
         self.path = self._get_path(path, url)
@@ -99,6 +102,7 @@ class Homura(object):
         self.show_progress = show_progress
         self.resume = resume
         self.auto_retry = auto_retry
+        self.max_rst_retries = max_rst_retries
         self.start_time = None
         self.content_length = 0
         self.downloaded = 0
@@ -106,6 +110,7 @@ class Homura(object):
         self._pycurl = pycurl.Curl()
         self._cookie_header = self._get_cookie_header()
         self._last_time = 0.0
+        self._rst_retries = 0
 
     def _get_cookie_header(self):
         if self.session is not None:
@@ -175,6 +180,13 @@ class Homura(object):
                 # Cannot resume.
                 elif e.args[0] == 33:
                     break
+                # Recv failure: Connection reset by peer
+                elif e.args[0] == 56:
+                    if self._rst_retries < self.max_rst_retries:
+                        pass
+                    else:
+                        raise e
+                    self._rst_retries += 1
                 else:
                     raise e
         self._move_path()
