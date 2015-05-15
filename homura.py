@@ -261,7 +261,8 @@ class Homura(object):
 
 
 def download(url, path=None, headers=None, session=None, show_progress=True,
-             resume=True, auto_retry=True):
+             resume=True, auto_retry=True, max_rst_retries=5):
     """Download using download manager"""
-    hm = Homura(url, path, headers, session, show_progress, resume, auto_retry)
+    hm = Homura(url, path, headers, session, show_progress, resume,
+                auto_retry, max_rst_retries)
     hm.start()
