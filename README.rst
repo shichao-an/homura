@@ -1,6 +1,8 @@
 Homura
 ======
 
+|Build| |PyPI version|
+
 Homura (ほむら) is a Python downloader with progress, which can be used to download large files.
 
 It is named after `Homura Akemi <http://ja.wikipedia.org/wiki/%E6%9A%81%E7%BE%8E%E3%81%BB%E3%82%80%E3%82%89>`_.
@@ -69,3 +71,7 @@ Or you can work with ``Session`` objects of the `requests <http://docs.python-re
     # Do some work with `s` and send requests
     >>> download(url='http://example.com', session=s)
 
+.. |Build| image:: https://api.travis-ci.org/shichao-an/homura.png?branch=master
+   :target: http://travis-ci.org/shichao-an/homura
+.. |PyPI version| image:: https://pypip.in/v/homura/badge.png
+   :target: https://pypi.python.org/pypi/homura/

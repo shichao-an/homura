@@ -1,10 +1,15 @@
 language: python
 
+python:
+  - "2.7"
+  - "3.3"
+  - "3.4"
+
 branches:
   only:
     - master
 
 install:
-  - pip install nose tox -r requirements.txt
+  - pip install nose -r requirements.txt
 
-script: tox
+script: nosetests
