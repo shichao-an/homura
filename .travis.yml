@@ -1,0 +1,10 @@
+language: python
+
+branches:
+  only:
+    - master
+
+install:
+  - pip install nose tox -r requirements.txt
+
+script: tox
