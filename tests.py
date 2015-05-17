@@ -15,10 +15,10 @@ SUBDIR_RELPATH = os.path.basename(TEST_DATA_SUBDIR)
 FILE_SMALL = 'http://download.thinkbroadband.com/MD5SUMS'
 FILE_1MB = 'http://download.thinkbroadband.com/1MB.zip'
 FILE_5MB = 'http://download.thinkbroadband.com/5MB.zip'
-FILE_301_SMALL = 'http://dev.moleculea.com/homura/301/SMD5SUMS'
-FILE_301_1MB = 'http://dev.moleculea.com/homura/301/S1MB.zip'
-FILE_301_5MB = 'http://dev.moleculea.com/homura/301/S5MB.zip'
-FILE_UNICODE = u'http://dev.moleculea.com/离线下载.txt'
+FILE_301_SMALL = 'https://dev.moleculea.com/homura/301/SMD5SUMS'
+FILE_301_1MB = 'https://dev.moleculea.com/homura/301/S1MB.zip'
+FILE_301_5MB = 'https://dev.moleculea.com/homura/301/S5MB.zip'
+FILE_UNICODE = u'https://dev.moleculea.com/离线下载.txt'
 FILE_UTF8 = utf8_encode(u'http://dev.moleculea.com/离线下载.txt')
 
 
