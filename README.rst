@@ -73,5 +73,5 @@ Or you can work with ``Session`` objects of the `requests <http://docs.python-re
 
 .. |Build| image:: https://api.travis-ci.org/shichao-an/homura.png?branch=master
    :target: http://travis-ci.org/shichao-an/homura
-.. |PyPI version| image:: https://pypip.in/v/homura/badge.png
+.. |PyPI version| image:: https://img.shields.io/pypi/v/homura.png
    :target: https://pypi.python.org/pypi/homura/
