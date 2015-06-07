@@ -111,7 +111,7 @@ class Homura(object):
         self._cookie_header = self._get_cookie_header()
         self._last_time = 0.0
         self._rst_retries = 0
-        self.__pass_through_opts = pass_through_opts
+        self._pass_through_opts = pass_through_opts
 
     def _get_cookie_header(self):
         if self.session is not None:
@@ -160,7 +160,7 @@ class Homura(object):
             c.setopt(c.NOPROGRESS, 0)
             c.setopt(pycurl.FOLLOWLOCATION, 1)
             c.setopt(c.PROGRESSFUNCTION, self.progress)
-            for key, value in self.__pass_through_opts.items():
+            for key, value in self._pass_through_opts.items():
                 c.setopt(key, value)
             c.perform()
 
@@ -264,7 +264,8 @@ class Homura(object):
 
 
 def download(url, path=None, headers=None, session=None, show_progress=True,
-             resume=True, auto_retry=True, max_rst_retries=5, pass_through_opts={}):
+             resume=True, auto_retry=True, max_rst_retries=5,
+             pass_through_opts={}):
     """Download using download manager"""
     hm = Homura(url, path, headers, session, show_progress, resume,
                 auto_retry, max_rst_retries, pass_through_opts)
