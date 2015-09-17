@@ -78,7 +78,7 @@ class Homura(object):
 
     def __init__(self, url, path=None, headers=None, session=None,
                  show_progress=True, resume=True, auto_retry=True,
-                 max_rst_retries=5, pass_through_opts={}):
+                 max_rst_retries=5, pass_through_opts=None):
         """
         :param str url: URL of the file to be downloaded
         :param str path: local path for the downloaded file; if None, it will
@@ -94,6 +94,7 @@ class Homura(object):
             transfer until the file's download is finished
         :param int max_rst_retries: number of retries upon connection reset by
             peer (effective only when `auto_retry` is True)
+        :param dict pass_through_opts: a dictinary of options passed to cURL
         """
         self.url = url  # url is in unicode
         self.path = self._get_path(path, url)
@@ -160,8 +161,9 @@ class Homura(object):
             c.setopt(c.NOPROGRESS, 0)
             c.setopt(pycurl.FOLLOWLOCATION, 1)
             c.setopt(c.PROGRESSFUNCTION, self.progress)
-            for key, value in self._pass_through_opts.items():
-                c.setopt(key, value)
+            if self._pass_through_opts:
+                for key, value in self._pass_through_opts.items():
+                    c.setopt(key, value)
             c.perform()
 
     def start(self):
@@ -265,8 +267,8 @@ class Homura(object):
 
 def download(url, path=None, headers=None, session=None, show_progress=True,
              resume=True, auto_retry=True, max_rst_retries=5,
-             pass_through_opts={}):
-    """Download using download manager"""
+             pass_through_opts=None):
+    """Main download function"""
     hm = Homura(url, path, headers, session, show_progress, resume,
                 auto_retry, max_rst_retries, pass_through_opts)
     hm.start()

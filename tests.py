@@ -1,9 +1,10 @@
 # -*- coding: utf-8 -*-
-from homura import utf8_encode
-import shutil
 import os
+import pycurl
+import shutil
 from unittest import TestCase
 from homura import download, get_resource_name
+from homura import utf8_encode
 
 PROJECT_PATH = os.path.abspath(os.path.dirname(__file__))
 TEST_DATA_DIR = os.path.join(PROJECT_PATH, 'test_data')
@@ -155,6 +156,17 @@ class TestDownload(TestCase):
                          utf8_encode(get_resource_name(url)))
         assert os.path.exists(f)
         os.remove(f)
+
+    def test_pass_through_opts(self):
+        url = FILE_5MB
+        opts_url = FILE_1MB
+
+        download(url=url, pass_through_opts={pycurl.URL: opts_url})
+        f = os.path.join(TEST_DATA_DIR, get_resource_name(url))
+        opts_f = os.path.join(TEST_DATA_DIR, get_resource_name(opts_url))
+        assert os.path.exists(opts_f)
+        assert not os.path.exists(f)
+        os.remove(opts_f)
 
     def tearDown(self):
         cleanup_data()
