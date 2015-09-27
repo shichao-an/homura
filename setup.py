@@ -1,11 +1,14 @@
 from setuptools import setup
+from codecs import open as codecs_open
 
+with codecs_open('README.rst', encoding='utf-8') as f:
+    lng_desc = f.read()
 
 setup(
     name='homura',
     version='0.1.2',
     description="Python downloader with progress",
-    long_description=open('README.rst').read(),
+    long_description=lng_desc,
     keywords='download progress',
     author='Shichao An',
     author_email='shichao.an@nyu.edu',
