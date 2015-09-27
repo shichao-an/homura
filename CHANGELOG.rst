@@ -1,6 +1,11 @@
 Changelog
 =========
 
+0.1.3 (2015-09-26)
+------------------
+
+- Fixed `#5 <https://github.com/shichao-an/homura/issues/5>`_ and merged `#6 <https://github.com/shichao-an/homura/pull/6>`_.
+
 0.1.2 (2015-09-16)
 ------------------
 

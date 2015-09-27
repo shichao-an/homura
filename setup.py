@@ -6,7 +6,7 @@ with codecs_open('README.rst', encoding='utf-8') as f:
 
 setup(
     name='homura',
-    version='0.1.2',
+    version='0.1.3',
     description="Python downloader with progress",
     long_description=lng_desc,
     keywords='download progress',
