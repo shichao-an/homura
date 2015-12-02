@@ -7,17 +7,12 @@ import sys
 import time
 import pycurl
 import shutil
-from six.moves.urllib.parse import unquote as _unquote
+from six.moves.urllib.parse import urlparse, unquote as _unquote
 from humanize import naturalsize
 
 PY3 = sys.version_info[0] == 3
 STREAM = sys.stderr
 DEFAULT_RESOURCE = 'index.html'
-
-if PY3:
-    from urllib.parse import urlparse
-else:
-    from urlparse import urlparse
 
 
 def eval_path(path):
