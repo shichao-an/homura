@@ -24,6 +24,7 @@ FILE_UTF8 = utf8_encode(u'http://dev.moleculea.com/离线下载.txt')
 
 
 def cleanup_data():
+    os.chdir(PROJECT_PATH)
     if os.path.exists(TEST_DATA_DIR):
         shutil.rmtree(TEST_DATA_DIR)
 
