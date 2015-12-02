@@ -7,7 +7,7 @@ import sys
 import time
 import pycurl
 import shutil
-from requests.utils import unquote as _unquote
+from six.moves.urllib.parse import unquote as _unquote
 from humanize import naturalsize
 
 PY3 = sys.version_info[0] == 3
