@@ -179,14 +179,14 @@ class Homura(object):
                 self.curl()
             except pycurl.error as e:
                 # transfer closed with n bytes remaining to read
-                if e.args[0] == 18:
+                if e.args[0] == pycurl.E_PARTIAL_FILE:
                     pass
                 # HTTP server doesn't seem to support byte ranges.
                 # Cannot resume.
-                elif e.args[0] == 33:
+                elif e.args[0] == pycurl.E_HTTP_RANGE_ERROR:
                     break
                 # Recv failure: Connection reset by peer
-                elif e.args[0] == 56:
+                elif e.args[0] == pycurl.E_RECV_ERROR:
                     if self._rst_retries < self.max_rst_retries:
                         pass
                     else:
