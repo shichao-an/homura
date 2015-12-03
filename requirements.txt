@@ -1,4 +1,3 @@
 humanize
-requests
 six
 pycurl
