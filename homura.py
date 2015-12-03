@@ -10,6 +10,11 @@ import shutil
 from six.moves.urllib.parse import urlparse, unquote as _unquote
 from humanize import naturalsize
 
+try:
+    import certifi
+except ImportError:
+    certifi = None
+
 PY3 = sys.version_info[0] == 3
 STREAM = sys.stderr
 DEFAULT_RESOURCE = 'index.html'
@@ -73,7 +78,7 @@ class Homura(object):
 
     def __init__(self, url, path=None, headers=None, session=None,
                  show_progress=True, resume=True, auto_retry=True,
-                 max_rst_retries=5, pass_through_opts=None):
+                 max_rst_retries=5, cainfo=None, pass_through_opts=None):
         """
         :param str url: URL of the file to be downloaded
         :param str path: local path for the downloaded file; if None, it will
@@ -89,6 +94,7 @@ class Homura(object):
             transfer until the file's download is finished
         :param int max_rst_retries: number of retries upon connection reset by
             peer (effective only when `auto_retry` is True)
+        :param str cainfo: optional path to a PEM file containing the CA certificate
         :param dict pass_through_opts: a dictinary of options passed to cURL
         """
         self.url = url  # url is in unicode
@@ -99,6 +105,7 @@ class Homura(object):
         self.resume = resume
         self.auto_retry = auto_retry
         self.max_rst_retries = max_rst_retries
+        self.cainfo = cainfo
         self.start_time = None
         self.content_length = 0
         self.downloaded = 0
@@ -137,6 +144,24 @@ class Homura(object):
             headers['Cookie'] = self._cookie_header
         return dict_to_list(headers) or None
 
+    def _fill_in_cainfo(self):
+        """Fill in the path of the PEM file containing the CA certificate.
+
+        The priority is: 1. user provided path, 2. path to the cacert.pem
+        bundle provided by certifi (if installed), 3. let pycurl use the
+        system path where libcurl's cacert bundle is assumed to be stored,
+        as established at libcurl build time.
+        """
+        if self.cainfo:
+            cainfo = self.cainfo
+        else:
+            try:
+                cainfo = certifi.where()
+            except AttributeError:
+                cainfo = None
+        if cainfo:
+            self._pycurl.setopt(pycurl.CAINFO, cainfo)
+
     def curl(self):
         """Sending a single cURL request to download"""
         c = self._pycurl
@@ -156,6 +181,7 @@ class Homura(object):
             c.setopt(c.NOPROGRESS, 0)
             c.setopt(pycurl.FOLLOWLOCATION, 1)
             c.setopt(c.PROGRESSFUNCTION, self.progress)
+            self._fill_in_cainfo()
             if self._pass_through_opts:
                 for key, value in self._pass_through_opts.items():
                     c.setopt(key, value)
@@ -261,9 +287,9 @@ class Homura(object):
 
 
 def download(url, path=None, headers=None, session=None, show_progress=True,
-             resume=True, auto_retry=True, max_rst_retries=5,
+             resume=True, auto_retry=True, max_rst_retries=5, cainfo=None,
              pass_through_opts=None):
     """Main download function"""
     hm = Homura(url, path, headers, session, show_progress, resume,
-                auto_retry, max_rst_retries, pass_through_opts)
+                auto_retry, max_rst_retries, cainfo, pass_through_opts)
     hm.start()
