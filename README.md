@@ -13,7 +13,6 @@ It is named after [Homura Akemi](http://ja.wikipedia.org/wiki/%E6%9A%81%E7%BE%8E
 * Resume downloads (if server supports [byte ranges](http://en.wikipedia.org/wiki/Byte_serving) on the resource)
 * Support for `requests.Session`
 
-
 ### Installation
 
 Homura depends on [PycURL](http://pycurl.sourceforge.net/). Install dependencies before installing the python package:
@@ -50,33 +49,39 @@ pip install homura
 
 The simplest usage is to import the utility function `download`:
 
-
-```pycon
->>> from homura import download
->>> download('http://download.thinkbroadband.com/200MB.zip')
+```python
+from homura import download
+download('http://download.thinkbroadband.com/200MB.zip')
     3%      6.2 MiB     739.5 KiB/s            0:04:28 ETA
 ```
 
 To specify path for downloaded file:
 
-```pycon
->>> download(url='http://download.thinkbroadband.com/200MB.zip',
-             path='/path/to/big.zip')
+```python
+download(url='http://download.thinkbroadband.com/200MB.zip',
+         path='/path/to/big.zip')
 ```
 
 You can specify extra headers as a dictionary:
 
-```pycon
->>> download(url='http://example.com', headers={'API-Key': '123456'})
+```python
+download(url='http://example.com', headers={'API-Key': '123456'})
 ```
 
-Or you can work with `Session` objects of the [requests](http://docs.python-requests.org/en/latest/) library:
+You can work with `Session` objects of the [requests](http://docs.python-requests.org/en/latest/) library:
 
-```pycon
->>> import requests
->>> s = requests.Session()
+```python
+import requests
+s = requests.Session()
 # Do some work with `s` and send requests
->>> download(url='http://example.com', session=s)
+download(url='http://example.com', session=s)
+```
+
+Pass options to `setopt` of the `pycurl.Curl` object via the `pass_through_opts` argument:
+
+```python
+import pycurl
+download(url=url, pass_through_opts={pycurl.FOLLOWLOCATION: True})
 ```
 
 [travis-image]: https://api.travis-ci.org/shichao-an/homura.png?branch=master
