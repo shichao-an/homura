@@ -108,7 +108,7 @@ class Homura(object):
         self.max_rst_retries = max_rst_retries
         self.cainfo = cainfo
         self.start_time = None
-        self.content_length = 0
+        self.content_length = None
         self.downloaded = 0
         self._path = path  # Save given path
         self._pycurl = pycurl.Curl()
