@@ -21,6 +21,7 @@ DEFAULT_RESOURCE = 'index.html'
 
 __version__ = '0.1.3'
 
+
 def eval_path(path):
     return os.path.abspath(os.path.expanduser(path))
 
@@ -79,7 +80,8 @@ class Homura(object):
 
     def __init__(self, url, path=None, headers=None, session=None,
                  show_progress=True, resume=True, auto_retry=True,
-                 max_rst_retries=5, pass_through_opts=None, user_agent=None, cainfo=None):
+                 max_rst_retries=5, pass_through_opts=None, cainfo=None,
+                 user_agent=None):
         """
         :param str url: URL of the file to be downloaded
         :param str path: local path for the downloaded file; if None, it will
@@ -96,9 +98,9 @@ class Homura(object):
         :param int max_rst_retries: number of retries upon connection reset by
             peer (effective only when `auto_retry` is True)
         :param dict pass_through_opts: a dictinary of options passed to cURL
-        :param dict user_agent: set a custom user agent string
         :param str cainfo: optional path to a PEM file containing the CA
             certificate
+        :param str user_agent: set a custom user agent string
         """
         self.url = url  # url is in unicode
         self.path = self._get_path(path, url)
@@ -293,8 +295,9 @@ class Homura(object):
 
 def download(url, path=None, headers=None, session=None, show_progress=True,
              resume=True, auto_retry=True, max_rst_retries=5,
-             pass_through_opts=None, user_agent=None, cainfo=None):
+             pass_through_opts=None, cainfo=None, user_agent=None):
     """Main download function"""
     hm = Homura(url, path, headers, session, show_progress, resume,
-                auto_retry, max_rst_retries, pass_through_opts, user_agent, cainfo)
+                auto_retry, max_rst_retries, pass_through_opts, cainfo,
+                user_agent)
     hm.start()
