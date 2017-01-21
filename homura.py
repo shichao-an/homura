@@ -19,7 +19,7 @@ PY3 = sys.version_info[0] == 3
 STREAM = sys.stderr
 DEFAULT_RESOURCE = 'index.html'
 
-__version__ = '0.1.3'
+__version__ = '0.1.4'
 
 
 def eval_path(path):
