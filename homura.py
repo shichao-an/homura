@@ -19,6 +19,8 @@ PY3 = sys.version_info[0] == 3
 STREAM = sys.stderr
 DEFAULT_RESOURCE = 'index.html'
 
+__version__ = '0.1.3'
+
 
 def eval_path(path):
     return os.path.abspath(os.path.expanduser(path))
@@ -78,7 +80,8 @@ class Homura(object):
 
     def __init__(self, url, path=None, headers=None, session=None,
                  show_progress=True, resume=True, auto_retry=True,
-                 max_rst_retries=5, pass_through_opts=None, cainfo=None):
+                 max_rst_retries=5, pass_through_opts=None, cainfo=None,
+                 user_agent=None):
         """
         :param str url: URL of the file to be downloaded
         :param str path: local path for the downloaded file; if None, it will
@@ -97,6 +100,7 @@ class Homura(object):
         :param dict pass_through_opts: a dictinary of options passed to cURL
         :param str cainfo: optional path to a PEM file containing the CA
             certificate
+        :param str user_agent: set a custom user agent string
         """
         self.url = url  # url is in unicode
         self.path = self._get_path(path, url)
@@ -116,6 +120,7 @@ class Homura(object):
         self._last_time = 0.0
         self._rst_retries = 0
         self._pass_through_opts = pass_through_opts
+        self._user_agent = user_agent or 'homura/' + __version__
 
     def _get_cookie_header(self):
         if self.session is not None:
@@ -174,6 +179,7 @@ class Homura(object):
         else:
             mode = 'wb'
         with open(self.path, mode) as f:
+            c.setopt(c.USERAGENT, self._user_agent)
             c.setopt(c.URL, utf8_encode(self.url))
             c.setopt(c.WRITEDATA, f)
             h = self._get_pycurl_headers()
@@ -289,8 +295,9 @@ class Homura(object):
 
 def download(url, path=None, headers=None, session=None, show_progress=True,
              resume=True, auto_retry=True, max_rst_retries=5,
-             pass_through_opts=None, cainfo=None):
+             pass_through_opts=None, cainfo=None, user_agent=None):
     """Main download function"""
     hm = Homura(url, path, headers, session, show_progress, resume,
-                auto_retry, max_rst_retries, pass_through_opts, cainfo)
+                auto_retry, max_rst_retries, pass_through_opts, cainfo,
+                user_agent)
     hm.start()
