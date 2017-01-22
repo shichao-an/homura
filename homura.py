@@ -101,7 +101,7 @@ class Homura(object):
         :param str cainfo: optional path to a PEM file containing the CA
             certificate
         :param str user_agent: set a custom user agent string
-        :param (str, str) auth: username and password for authentication
+        :param tuple auth: a tuple of username and password for authentication
         """
         self.url = url  # url is in unicode
         self.path = self._get_path(path, url)
