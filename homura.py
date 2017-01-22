@@ -81,7 +81,7 @@ class Homura(object):
     def __init__(self, url, path=None, headers=None, session=None,
                  show_progress=True, resume=True, auto_retry=True,
                  max_rst_retries=5, pass_through_opts=None, cainfo=None,
-                 user_agent=None):
+                 user_agent=None, auth=None):
         """
         :param str url: URL of the file to be downloaded
         :param str path: local path for the downloaded file; if None, it will
@@ -97,10 +97,11 @@ class Homura(object):
             transfer until the file's download is finished
         :param int max_rst_retries: number of retries upon connection reset by
             peer (effective only when `auto_retry` is True)
-        :param dict pass_through_opts: a dictinary of options passed to cURL
+        :param dict pass_through_opts: a dictionary of options passed to cURL
         :param str cainfo: optional path to a PEM file containing the CA
             certificate
         :param str user_agent: set a custom user agent string
+        :param tuple auth: a tuple of username and password for authentication
         """
         self.url = url  # url is in unicode
         self.path = self._get_path(path, url)
@@ -114,6 +115,11 @@ class Homura(object):
         self.start_time = None
         self.content_length = None
         self.downloaded = 0
+        self.auth = None
+        if session:
+            self.auth = session.auth
+        if auth:
+            self.auth = auth
         self._path = path  # Save given path
         self._pycurl = pycurl.Curl()
         self._cookie_header = self._get_cookie_header()
@@ -179,8 +185,10 @@ class Homura(object):
         else:
             mode = 'wb'
         with open(self.path, mode) as f:
-            c.setopt(c.USERAGENT, self._user_agent)
             c.setopt(c.URL, utf8_encode(self.url))
+            if self.auth:
+                c.setopt(c.USERPWD, '%s:%s' % self.auth)
+            c.setopt(c.USERAGENT, self._user_agent)
             c.setopt(c.WRITEDATA, f)
             h = self._get_pycurl_headers()
             if h is not None:
@@ -295,9 +303,9 @@ class Homura(object):
 
 def download(url, path=None, headers=None, session=None, show_progress=True,
              resume=True, auto_retry=True, max_rst_retries=5,
-             pass_through_opts=None, cainfo=None, user_agent=None):
+             pass_through_opts=None, cainfo=None, user_agent=None, auth=None):
     """Main download function"""
     hm = Homura(url, path, headers, session, show_progress, resume,
                 auto_retry, max_rst_retries, pass_through_opts, cainfo,
-                user_agent)
+                user_agent, auth)
     hm.start()

@@ -3,8 +3,8 @@ import os
 import pycurl
 import shutil
 from unittest import TestCase
-from homura import download, get_resource_name
-from homura import utf8_encode
+
+from homura import download, get_resource_name, utf8_encode
 
 PROJECT_PATH = os.path.abspath(os.path.dirname(__file__))
 TEST_DATA_DIR = os.path.join(PROJECT_PATH, 'test_data')
@@ -168,6 +168,19 @@ class TestDownload(TestCase):
         assert os.path.exists(opts_f)
         assert not os.path.exists(f)
         os.remove(opts_f)
+
+    def test_auth(self):
+        url = "http://httpbin.org/basic-auth/aaa/bbb"
+        auth = ("aaa", "bbb")
+
+        download(url=url, auth=auth)
+        f = os.path.join(TEST_DATA_DIR, get_resource_name(url))
+        with open(f) as handle:
+            txt = handle.read()
+        assert '"authenticated": true' in txt
+        assert '"user": "aaa"' in txt
+        assert os.path.exists(f)
+        os.remove(f)
 
     def tearDown(self):
         cleanup_data()
