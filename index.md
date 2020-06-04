@@ -5,7 +5,7 @@
 
 Homura (ほむら) is a Python downloader with progress, which can be used to download large files.
 
-It is named after [Homura Akemi](http://ja.wikipedia.org/wiki/%E6%9A%81%E7%BE%8E%E3%81%BB%E3%82%80%E3%82%89>).
+It is named after [Homura Akemi](https://en.wikipedia.org/wiki/Homura_Akemi).
 
 ### Features
 
